@@ -12,28 +12,17 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
 
-$sql = "SELECT item.id, item.name, item.image_url, item.description, item.brand_id, brand.name AS brand_name, item.category_id, category.name AS category_name
-FROM item
-LEFT JOIN brand
-  ON item.brand_id = brand.id
-LEFT JOIN category
-  ON item.category_id = category.id
-ORDER BY brand.name;
-";
-
-$result = $conn->query($sql);
-
-
-if ($result->num_rows > 0) {
+$get_categories_query = "SELECT * FROM category ORDER BY name";
+$get_categories_result = $conn->query($get_categories_query);
+if ($get_categories_result->num_rows > 0) {
     // output data of each row
-  $rows = [];
-    while($row = $result->fetch_assoc()) {
-      array_push($rows, $row);
+    $category_rows = [];
+    while($category_row = $get_categories_result->fetch_assoc()) {
+      array_push($category_rows, $category_row);
     }
 } else {
     echo "0 results";
 }
-
 $conn->close();
 ?>
 
@@ -52,39 +41,18 @@ $conn->close();
   <title>PriceTale</title>
 </head>
 <body>
-  <?php include './general/header.php';?>
+  <?php include '../general/header.php';?>
   <div class="container">
-    <?php if (!empty($_GET['new_product_name'])) { ?>
+    <?php if (!empty($_GET['new_category_name'])) { ?>
       <div class="alert alert-success mt-3" role="alert">
-        <?php echo $_GET['new_product_name']." was successfully added!"?>
+        <?php echo $_GET['new_category_name']." was successfully added!"?>
       </div>
     <?php }?>
-    <h1>Items</h1>
-    <div class="card-container">
-      <?php foreach ($rows as $item) { ?>
-          <div class="card item-card">
-            <img src="<?php echo $item['image_url'] ?>" class="card-img-top product-image" alt="...">
-
-            <div class="card-body">
-
-              <h5 class="card-title"><?php echo $item['name'] ?></h5>
-              <h6 class="card-subtitle mb-2">
-                <?php if ($item['brand_name']) { ?>
-                  <button type="button" class="btn btn-sm btn-outline-secondary brand-btn-sm" disabled>#<?php echo $item['brand_name'] ?></button>
-                <?php } ?>
-                <?php if ($item['category_name']) { ?>
-                  <button type="button" class="btn btn-sm btn-outline-secondary brand-btn-sm" disabled>#<?php echo $item['category_name'] ?></button>
-                <?php } ?>
-              </h6>
-
-              <p class="description-sm"><?php echo str_replace("\n", "<br>", $item['description']) ?></p>
-            </div>
-            <div class="card-footer">
-              <small class="text-muted"><?php echo 'Price: ???'?></small>
-            </div>
-          </div>
-      <?php } ?>
-    </div>
+    <h1>Categories</h1>
+    <a href="/categories/new.php" class="btn btn-outline-primary" role="button">Add Category</a><br>
+    <?php foreach ($category_rows as $category) { ?>
+      <?php echo $category['name'] ?><br>
+    <?php } ?>
   </div>
 
 

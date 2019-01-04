@@ -10,10 +10,10 @@
 				<a class="nav-link" href="/">Home</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" href="#">Brands</a>
+				<a class="nav-link" href="/brands/">Brands</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" href="#">Categories</a>
+				<a class="nav-link" href="/categories/">Categories</a>
 			</li>
 		</ul>
 		<form class="form-inline my-2 my-lg-0">

@@ -1,0 +1,30 @@
+.brand-btn-sm {
+	padding: 0.25rem .3rem;
+	font-size: 12px;
+	line-height: 0.75;
+	border-radius: .25rem;
+}
+
+.product-image {
+	max-height: 300px;
+	object-fit: contain;
+}
+
+.description-sm {
+	margin-bottom: 0;
+	font-size: 12px;
+	overflow-y: auto;
+	max-height: 100px;
+}
+
+.card-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	flex-direction: row;
+}
+
+.item-card {
+	width: 250px;
+	margin-bottom: 20px;
+}

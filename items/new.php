@@ -27,6 +27,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $new_item_query = "INSERT INTO item (brand_id, category_id, product_code, image_url, name, description) VALUES ('".$brand_id."', '".$category_id."', '".$product_code."', '".$image_url."', '".$name."', '".$description."');";
 
     $new_item_query_result = $conn->query($new_item_query);
+    if ($new_item_query_result) { // Success
+      header('Location: /index.php?new_product_name='.$name);
+      die();
+    }
   }
 }
 
@@ -70,6 +74,7 @@ $conn->close();
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/style.css">
 
   <title>PriceTale</title>
 </head>
@@ -109,7 +114,7 @@ $conn->close();
               <div class="form-group col-md-6">
                 <label for="">Image Preview</label>
                 <p id="image-placeholder">None</p>
-                <img id="image-display" style="display:none" src="" class="img-thumbnail" alt="...">
+                <img id="image-display" style="display:none" src="" class="img-thumbnail product-image" alt="...">
               </div>
             </div>
             <div class="form-group">
@@ -134,9 +139,6 @@ $conn->close();
                   <?php foreach ($category_rows as $category) { ?>
                     <option value="<?php echo $category['id'] ?>"><?php echo $category['name'] ?></option>
                   <?php } ?>
-
-
-
                 </select>
               </div>
             </div>
