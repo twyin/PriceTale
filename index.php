@@ -49,6 +49,9 @@ $conn->close();
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
   <link rel="stylesheet" href="/css/style.css">
 
+  <!-- Datepicker CSS -->
+  <link href="https://unpkg.com/gijgo@1.9.11/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+
   <title>PriceTale</title>
 </head>
 <body>
@@ -117,7 +120,7 @@ $conn->close();
                               }
                             } ?>
                           <tr>
-                            <td class="align-middle">Add a new price</td>
+                            <td class="align-middle"><input name="date" id="datepicker<?php echo $item['id']?>" width="276" /></td>
                             <td>
                               <strong>
                                 <div class="input-group">
@@ -152,5 +155,13 @@ $conn->close();
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/gijgo@1.9.11/js/gijgo.min.js" type="text/javascript"></script>
+  <?php foreach ($rows as $item) { ?>
+    <script>
+        $('#datepicker<?php echo $item['id']?>').datepicker({
+            uiLibrary: 'bootstrap4'
+        });
+    </script>
+  <?php } ?>
 </body>
 </html>
