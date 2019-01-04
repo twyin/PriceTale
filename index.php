@@ -80,11 +80,66 @@ $conn->close();
               <p class="description-sm"><?php echo str_replace("\n", "<br>", $item['description']) ?></p>
             </div>
             <div class="card-footer bg-transparent">
-              <small class="text"><?php echo 'Price: ???'?></small>
-              <button type="button" class="btn btn-sm btn-link price-history-button">
+              <small class="text">Price: <?php echo '???'?></small>
+              <button type="button" class="btn btn-sm btn-link price-history-button" data-toggle="modal" data-target="#priceHistoryModal<?php echo $item['id']?>">
                 <i class="fas fa-chart-line"></i>
                 History
               </button>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="priceHistoryModal<?php echo $item['id']?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <form method="post" action="/price_records/new.php">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Price History for <?php echo $item['name']?></h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <table class="table table-bordered table-hover">
+                        <thead>
+                          <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Price</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php
+                            foreach ($cur_price_records as $price_record) { 
+                              if ($price_record['item_id'] == $item['id']) { ?>
+                                <tr>
+                                  <td><?php echo $price_record['date'] ?></td>
+                                  <td><strong>$<?php echo $price_record['price'] ?></strong></td>
+                                </tr>
+                          <?php 
+                              }
+                            } ?>
+                          <tr>
+                            <td class="align-middle">Add a new price</td>
+                            <td>
+                              <strong>
+                                <div class="input-group">
+                                  <div class="input-group-prepend">
+                                    <span class="input-group-text">$</span>
+                                  </div>
+                                  <input type="number" name="price" class="form-control" placeholder="123.00">
+                                  <input type="number" name="item_id" value="<?php echo $item['id'] ?>" style="display: none">
+                                </div>
+                              </strong>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Submit new price</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </div>
           </div>
       <?php } ?>
