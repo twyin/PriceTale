@@ -12,15 +12,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
 
-$sql = "SELECT item.id, item.name, item.image_url, item.description, item.brand_id, brand.name AS brand_name
-FROM item
-LEFT JOIN brand
-ON item.brand_id = brand.id
-ORDER BY brand.name;
-";
-
+$sql = "SELECT id, name, image_url, description FROM item";
 $result = $conn->query($sql);
-
 
 if ($result->num_rows > 0) {
     // output data of each row
@@ -48,12 +41,6 @@ $conn->close();
 
   <title>PriceTale</title>
   <style>
-  .brand-btn-sm {
-    padding: 0.25rem .3rem;
-    font-size: 12px;
-    line-height: 0.75;
-    border-radius: .25rem;
-  }
   .card-img-top {
     max-height: 300px;
     object-fit: contain;
@@ -92,16 +79,12 @@ $conn->close();
       <?php foreach ($rows as $item) { ?>
           <div class="card">
             <img src="<?php echo $item['image_url'] ?>" class="card-img-top" alt="...">
-
             <div class="card-body">
-
               <h5 class="card-title"><?php echo $item['name'] ?></h5>
-              <h6 class="card-subtitle mb-2"><button type="button" class="btn btn-sm btn-outline-secondary brand-btn-sm" disabled>#<?php echo $item['brand_name'] ?></button></h6>
-
               <p class="card-text"><?php echo str_replace("\n", "<br>", $item['description']) ?></p>
             </div>
             <div class="card-footer">
-              <small class="text-muted"><?php echo $item['brand_id'] ?></small>
+              <small class="text-muted"><?php echo $item['id'] ?></small>
             </div>
           </div>
       <?php } ?>
