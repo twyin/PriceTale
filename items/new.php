@@ -10,9 +10,55 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
-} 
+}
+
+$nameErr="";
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if (empty($_POST['name'])) {
+    $nameErr = "Please enter a product name.";
+  } else {
+    $name = $_POST['name'];
+    $product_code = $_POST['product_code'];
+    $image_url = $_POST['image_url'];
+    $description = $_POST['description'];
+    $brand_id = $_POST['brand'];
+    $category_id = $_POST['category'];
+
+    $new_item_query = "INSERT INTO item (brand_id, category_id, product_code, image_url, name, description) VALUES ('".$brand_id."', '".$category_id."', '".$product_code."', '".$image_url."', '".$name."', '".$description."');";
+
+    $new_item_query_result = $conn->query($new_item_query);
+  }
+}
+
+$get_brands_query = "SELECT * FROM brand ORDER BY name";
+$get_brands_result = $conn->query($get_brands_query);
+if ($get_brands_result->num_rows > 0) {
+    // output data of each row
+    $brand_rows = [];
+    while($brand_row = $get_brands_result->fetch_assoc()) {
+      array_push($brand_rows, $brand_row);
+    }
+} else {
+    echo "0 results";
+}
+
+$get_categories_query = "SELECT * FROM category";
+$get_categories_result = $conn->query($get_categories_query);
+if ($get_categories_result->num_rows > 0) {
+    $category_rows = [];
+    while($category_row = $get_categories_result->fetch_assoc()) {
+      array_push($category_rows, $category_row);
+    }
+} else {
+    echo "0 results";
+}
+
+
+
+
 $conn->close();
 ?>
+
 
 <!doctype html>
 <html lang="en">
@@ -28,33 +74,7 @@ $conn->close();
   <title>PriceTale</title>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/">PriceTale</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="/">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Brands</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Categories</a>
-        </li>
-      </ul>
-      <form class="form-inline my-2 my-lg-0">
-        <a href="/items/new.php" class="btn btn-outline-primary mr-sm-2 my-sm-0" role="button">Add Item</a>
-      </form>
-      <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search Items" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="fas fa-search"></i></button>
-      </form>
-    </div>
-  </nav>
+  <?php include '../general/header.php';?>
 
   <div class="container">
     <h1>New Item</h1>
@@ -63,21 +83,28 @@ $conn->close();
           Create a new Item
         </div>
         <div class="card-body">
-          <form>
+          <form action="/items/new.php" method="post">
             <div class="form-row">
               <div class="form-group col-md-6">
                 <label for="name">Name</label>
-                <input type="text" class="form-control" id="name" placeholder="Black Crossbody Bag">
+                <?php if(empty($nameErr)) { ?>
+                  <input type="text" class="form-control" name="name" id="name" placeholder="Black Crossbody Bag">
+                <?php } else { ?>
+                  <input type="text" class="form-control is-invalid" id="name" placeholder="Black Crossbody Bag"" required>
+                  <div class="invalid-feedback">
+                    <?php echo $nameErr ?>
+                  </div>
+                <?php } ?>
               </div>
               <div class="form-group col-md-6">
                 <label for="product_code">Product Code</label>
-                <input type="text" class="form-control" id="product_code" placeholder="M007">
+                <input type="text" class="form-control" name="product_code" id="product_code" placeholder="M007">
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
                 <label for="image_url">Image URL</label>
-                <input type="text" class="form-control" id="image_url" placeholder="https://louisvuitton.com/product/123.jpg" onchange="onURLChange">
+                <input type="text" class="form-control" name="image_url" id="image_url" placeholder="https://louisvuitton.com/product/123.jpg" onchange="onURLChange">
               </div>
               <div class="form-group col-md-6">
                 <label for="">Image Preview</label>
@@ -87,21 +114,29 @@ $conn->close();
             </div>
             <div class="form-group">
               <label for="description">Description</label>
-              <textarea class="form-control" id="description" rows="3" placeholder="Size, Colour, Material..."></textarea>
+              <textarea class="form-control" name="description" id="description" rows="3" placeholder="Size, Colour, Material..."></textarea>
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
                 <label for="brand">Brand</label>
-                <select id="brand" class="form-control">
-                  <option selected>Choose...</option>
-                  <option>...</option>
+                <select id="brand" name="brand" class="form-control">
+                  <option value="0" selected>Choose...</option>
+                  
+                  <?php foreach ($brand_rows as $brand) { ?>
+                    <option value="<?php echo $brand['id'] ?>"><?php echo $brand['name'] ?></option>
+                  <?php } ?>
                 </select>
               </div>
               <div class="form-group col-md-6">
                 <label for="category">Category</label>
-                <select id="category" class="form-control">
-                  <option selected>Choose...</option>
-                  <option>...</option>
+                <select id="category" name="category" class="form-control">
+                  <option value="0" selected>Choose...</option>
+                  <?php foreach ($category_rows as $category) { ?>
+                    <option value="<?php echo $category['id'] ?>"><?php echo $category['name'] ?></option>
+                  <?php } ?>
+
+
+
                 </select>
               </div>
             </div>
