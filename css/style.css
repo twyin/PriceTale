@@ -28,3 +28,14 @@
 	width: 250px;
 	margin-bottom: 20px;
 }
+
+.price-history-button {
+	float: right;
+	/*margin-top: 2px;*/
+	color: #a5436a8f;
+	text-decoration: none;
+}
+
+.price-history-button::hover {
+	text-decoration: none;
+}

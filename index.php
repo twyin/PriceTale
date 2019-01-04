@@ -79,8 +79,12 @@ $conn->close();
 
               <p class="description-sm"><?php echo str_replace("\n", "<br>", $item['description']) ?></p>
             </div>
-            <div class="card-footer">
-              <small class="text-muted"><?php echo 'Price: ???'?></small>
+            <div class="card-footer bg-transparent">
+              <small class="text"><?php echo 'Price: ???'?></small>
+              <button type="button" class="btn btn-sm btn-link price-history-button">
+                <i class="fas fa-chart-line"></i>
+                History
+              </button>
             </div>
           </div>
       <?php } ?>
