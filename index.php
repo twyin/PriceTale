@@ -104,8 +104,9 @@ $conn->close();
                 History
               </button>
             </div>
+
             <!-- Modal -->
-            <div class="modal fade" id="priceHistoryModal<?php echo $item['id']?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="priceHistoryModal<?php echo $item['id']?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" >
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <form method="post" action="/price_records/new.php">
@@ -173,9 +174,19 @@ $conn->close();
   <script src="https://unpkg.com/gijgo@1.9.11/js/gijgo.min.js" type="text/javascript"></script>
   <?php foreach ($rows as $item) { ?>
     <script>
+        // Datepicker for each modal
         $('#datepicker<?php echo $item['id']?>').datepicker({
             uiLibrary: 'bootstrap4'
         });
+        <?php
+          if (!empty($_GET['item_id']) && $_GET['item_id']==$item['id']) {
+            // display modal for that item
+            echo "$(function() {
+              $(\"#priceHistoryModal".$item['id']."\")[0].setAttribute(\"data-show\", true);
+              $(\"#priceHistoryModal".$item['id']."\").modal();
+            })";
+          }
+        ?>
     </script>
   <?php } ?>
 </body>
