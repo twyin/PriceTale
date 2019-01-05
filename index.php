@@ -106,7 +106,7 @@ $conn->close();
             </div>
 
             <!-- Modal -->
-            <div class="modal fade" id="priceHistoryModal<?php echo $item['id']?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" >
+            <div class="modal" id="priceHistoryModal<?php echo $item['id']?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" >
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <form method="post" action="/price_records/new.php">
