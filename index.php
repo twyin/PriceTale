@@ -33,7 +33,7 @@ if ($result->num_rows > 0) {
     echo "0 results";
 }
 
-$price_records_query = "SELECT * FROM price_record;";
+$price_records_query = "SELECT * FROM price_record ORDER BY date;";
 $price_records_query_result = $conn->query($price_records_query);
 if ($price_records_query_result->num_rows > 0) {
   $price_records_query_rows = [];
@@ -71,9 +71,16 @@ $conn->close();
         <?php echo $_GET['new_product_name']." was successfully added!"?>
       </div>
     <?php }?>
-    <h1>Items</h1>
+    <h3>Items</h3>
     <div class="card-container">
-      <?php foreach ($rows as $item) { ?>
+      <?php foreach ($rows as $item) {
+          $price_records_for_item = [];
+          foreach ($price_records_query_rows as $price_record) {
+            if ($price_record['item_id'] == $item['id']) {
+              array_push($price_records_for_item, $price_record);
+            }
+          }
+      ?>
           <div class="card item-card">
             <img src="<?php echo $item['image_url'] ?>" class="card-img-top product-image" alt="...">
             <div class="card-body">
@@ -90,11 +97,26 @@ $conn->close();
               <p class="description-sm"><?php echo str_replace("\n", "<br>", $item['description']) ?></p>
             </div>
             <div class="card-footer bg-transparent">
-              <small class="text">Price: <?php echo '???'?></small>
-              <button type="button" class="btn btn-sm btn-link price-history-button" data-toggle="modal" data-target="#priceHistoryModal<?php echo $item['id']?>" onclick="loadChart<?php echo $item['id']?>()">
-                <i class="fas fa-chart-line"></i>
-                History
-              </button>
+              <div class="row">
+                <div class="col-6 pr-0">
+                  <p style="margin-bottom: 0px; margin-top: 7px;">
+                    <?php
+                      $last_price = end($price_records_for_item)['price'];
+                      if ($last_price) {
+                        echo '<b>$'.$last_price.'</b>';
+                      } else {
+                        echo 'No Price';
+                      }
+                    ?>
+                  </p>
+                </div>
+                <div class="col-6 px-0">
+                  <button type="button" class="btn btn-link price-history-button" data-toggle="modal" data-target="#priceHistoryModal<?php echo $item['id']?>">
+                    <i class="fas fa-chart-line"></i>
+                    History
+                  </button>
+                </div>
+              </div>
             </div>
 
             <!-- Modal -->
@@ -110,7 +132,7 @@ $conn->close();
                     </div>
                     <div class="modal-body">
                       <div id="chartContainer<?php echo $item['id']?>" style="display: none;"></div>
-                      <table class="table table-bordered table-hover"> <thead>
+                      <table class="table table-bordered"> <thead>
                           <tr>
                             <th scope="col">Date</th>
                             <th scope="col">Price</th>
@@ -118,15 +140,15 @@ $conn->close();
                         </thead>
                         <tbody>
                           <?php
-                            foreach ($price_records_query_rows as $price_record) {
-                              if ($price_record['item_id'] == $item['id']) { ?>
-                                <tr>
-                                  <td><?php echo $price_record['date'] ?></td>
-                                  <td><strong>$<?php echo $price_record['price'] ?></strong></td>
-                                </tr>
+                            foreach ($price_records_for_item as $price_record) {
+                          ?>
+                              <tr>
+                                <td><?php echo $price_record['date'] ?></td>
+                                <td><strong>$<?php echo $price_record['price'] ?></strong></td>
+                              </tr>
                           <?php 
-                              }
-                            } ?>
+                            }
+                          ?>
                           <tr>
                             <td class="align-middle"><input name="date" id="datepicker<?php echo $item['id']?>" width="276" /></td>
                             <td>
@@ -172,6 +194,9 @@ $conn->close();
       $('#datepicker<?php echo $item['id']?>').datepicker({
         uiLibrary: 'bootstrap4'
       });
+      $("#priceHistoryModal<?php echo $item['id'] ?>").on('show.bs.modal', function (e) {
+        loadChart<?php echo $item['id']?>();
+      })
       // Display modal based on get parameter
       <?php
         if (!empty($_GET['item_id']) && $_GET['item_id']==$item['id']) {
@@ -184,47 +209,50 @@ $conn->close();
       ?>
 
       // Prepare Price History chart
-      <?php
-        $price_records_for_item = [];
-        foreach ($price_records_query_rows as $price_record) {
-          if ($price_record['item_id'] == $item['id']) {
-            array_push($price_records_for_item, $price_record);
+      function loadChart<?php echo $item['id']?>() {
+        <?php
+          $price_records_for_item = [];
+          foreach ($price_records_query_rows as $price_record) {
+            if ($price_record['item_id'] == $item['id']) {
+              array_push($price_records_for_item, $price_record);
+            }
           }
-        }
-        if (count($price_records_for_item) > 0) {
-      ?>
-          $('#chartContainer<?php echo $item['id']?>')[0].setAttribute('style', 'height: 300px; width: 100%;');
-          $(function() {
-            var chart = new CanvasJS.Chart(
-              "chartContainer<?php echo $item['id']?>",
-              {
-                axisX:{
-                  title: "Date",
-                  gridThickness: 2
-                },
-                axisY: {
-                  title: "Price ($)"
-                },
-                data: [{        
-                  type: "line",
-                  xValueType: "dateTime",
-                  dataPoints: [//array
-                    <?php
-                      foreach ($price_records_query_rows as $price_record) {
-                        if ($price_record['item_id'] == $item['id']) {
-                          echo "{ 'x': Date.parse(\"".$price_record['date']."\"), 'y': ".$price_record['price']."},";
+          if (count($price_records_for_item) > 0) {
+        ?>
+            $('#chartContainer<?php echo $item['id']?>')[0].setAttribute('style', 'height: 300px; width: 100%;');
+            $(function() {
+              var chart = new CanvasJS.Chart(
+                "chartContainer<?php echo $item['id']?>",
+                {
+                  responeive: true,
+                  axisX:{
+                    title: "Date",
+                    gridThickness: 2
+                  },
+                  axisY: {
+                    title: "Price ($)"
+                  },
+                  data: [{        
+                    type: "line",
+                    xValueType: "dateTime",
+                    dataPoints: [//array
+                      <?php
+                        foreach ($price_records_query_rows as $price_record) {
+                          if ($price_record['item_id'] == $item['id']) {
+                            echo "{ 'x': Date.parse(\"".$price_record['date']."\"), 'y': ".$price_record['price']."},";
+                          }
                         }
-                      }
-                    ?>
-                  ]
-                }]
-              }
-            );
-            chart.render();
-          })
-      <?php       
-        }
-      ?>
+                      ?>
+                    ]
+                  }]
+                }
+              );
+              chart.render();
+            })
+        <?php       
+          }
+        ?>
+      }
     </script>
   <?php } ?>
 </body>
