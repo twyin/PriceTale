@@ -23,16 +23,31 @@ ORDER BY brand.name;
 
 $result = $conn->query($sql);
 
-
 if ($result->num_rows > 0) {
     // output data of each row
   $rows = [];
-    while($row = $result->fetch_assoc()) {
-      array_push($rows, $row);
-    }
+  while($row = $result->fetch_assoc()) {
+    array_push($rows, $row);
+  }
 } else {
     echo "0 results";
 }
+
+$price_records_query = "SELECT * FROM price_record;";
+$price_records_query_result = $conn->query($price_records_query);
+if ($price_records_query_result->num_rows > 0) {
+  $price_records_query_rows = [];
+  while($price_records_query_row = $price_records_query_result->fetch_assoc()) {
+    array_push($price_records_query_rows, $price_records_query_row);
+  }
+} else {
+    echo "0 results";
+}
+
+
+
+
+
 
 $conn->close();
 ?>
@@ -110,7 +125,7 @@ $conn->close();
                         </thead>
                         <tbody>
                           <?php
-                            foreach ($cur_price_records as $price_record) { 
+                            foreach ($price_records_query_rows as $price_record) {
                               if ($price_record['item_id'] == $item['id']) { ?>
                                 <tr>
                                   <td><?php echo $price_record['date'] ?></td>
